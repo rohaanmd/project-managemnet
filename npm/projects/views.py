@@ -1,8 +1,13 @@
 from django.shortcuts import render,redirect
 from django.contrib import messages
 import validators
+import re
 from .models import Project
- 
+# url = https://google.com
+def formaturl(url):
+    if not re.match('(?:http|ftp|https)://', url):
+        return 'https://{}'.format(url)
+    return url
 #         
 # copy this to create a new view
 # messages.add_message(request, messages.SUCCESS, 'LOGIN successfull!!')
@@ -16,8 +21,13 @@ from .models import Project
 #     return render(request,"projects/index.html")
 
 def Index(request):
-    
-    return render(request,"projects/index.html")
+    proList = Project.objects.all()
+
+    params = {
+        "data" : proList
+    }
+
+    return render(request,"projects/index.html",params)
 
 
 def CreateView(request):
@@ -36,9 +46,10 @@ def Create(request):
         sec = request.POST.get("sec")
         git_link = request.POST.get("git_link")
         live_link = request.POST.get("live_link")
+        
         if(request.FILES):
             screenshot = request.FILES["screenshot"]
-        submitted_by = request.user
+        submitted_by = request.user # user should be logined in
 
         # validations
         if(not(len(enroll_no)==10)):
@@ -47,12 +58,18 @@ def Create(request):
         if( not (validators.url(git_link))):
             messages.add_message(request, messages.ERROR, 'Link Invalid.')
             return redirect("/project/create/")
+        else:
+            git_link = formaturl(git_link)
         if( len(live_link)<0 and not (validators.url(live_link))):
             messages.add_message(request, messages.ERROR, 'Link1 Invalid.')
             return redirect("/project/create/")
+        else:
+            live_link = formaturl(live_link)
         if(request.user is None):
-            messages.add_message(request, messages.ERROR, 'You are not allowed here')
-            return redirect("/project/create/")
+            messages.add_message(request, messages.ERROR, 'You are not Loggedin. ')
+            return redirect("/account/login/")
+        
+        print("HERE is link : "+str(live_link))
         
         # validation over
         try:
@@ -63,18 +80,28 @@ def Create(request):
                                     enroll_no=enroll_no,
                                     year=year,sec=sec,
                                     git_link=git_link,
-                                    live_link=live_link if (not len(live_link)>0)else None,
+                                    live_link= live_link if (len(str(live_link))>0) else None,
                                     screenshot= screenshot if (not (request.FILES==None))else None,
                                     submitted_by=submitted_by
                                 )
             NewProject.save()
+            return redirect("/project/")
         except Exception as e:
-
                 messages.add_message(request, messages.ERROR, e)
-                return redirect("/project/create/")
-                
-        return render(request,"projects/index.html")
+                return redirect("/project/")
+            
     else:
         messages.add_message(request, messages.ERROR, 'You are not allowed here')
-        return redirect("/")
+        return redirect("/project/")
 
+def Delete(request,id):
+    
+    project = Project.objects.get(id=id)
+    if((project.submitted_by.id == request.user.id) or request.user.is_superuser):
+        project.delete()
+    else:
+        messages.add_message(request, messages.ERROR, 'You cannot delete this Project')
+        return redirect("/project/")    
+    
+    messages.add_message(request, messages.SUCCESS, 'Project deleted successfully.')
+    return redirect("/project/")

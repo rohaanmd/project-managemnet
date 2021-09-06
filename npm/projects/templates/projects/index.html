@@ -5,6 +5,17 @@ Projects
 {% endblock title %}
 
 {% block css %}
+
+
+.custom-list .card-title,.custom-list .card-subtitle ,.custom-list .card-text {
+  text-transform: capitalize;
+
+}
+.custom-list .card{
+  padding: 25px;
+  margin: 10px 0;
+}
+
 {% endblock css %}
 
 {% block body %}
@@ -25,11 +36,103 @@ Projects
 {% endif %}
 
 <!-- body starts here -->
-{% if user.is_authenticated %}
-  <a href="/project/create/">Create a project</a>
+
+
+<div class="container custom-list">
+
+<h1 class="m-4 ms-0"> Thakur Polytechnic Projects</h1>
+
+<div class="row">
+  <div class="col-12">
+    {% if user.is_authenticated %}
+  <a class="btn btn-primary" href="/project/create/">Create a project</a>
   {% else %}
-  <a href="/account/login/">Login please bro</a>
+  You need to <a class="" href="/account/login/">login</a> to create a project
 {% endif %}
+  </div>
+</div>
+
+{% for d in data %}
+  <div class="card">
+  <div class="card-block">
+    <h1 class="card-title">{{d.title}}</h1>
+    <h4 class="card-subtitle mb-2 text-muted">{{d.submitted_by}} , {{d.year}}{{d.sec}}</h4>
+    <p class="card-text">{{d.desc}}</p>
+  {% if d.git_link|length > 0 %}
+    <a target="_blank" href="{{d.git_link}}" class="card-link btn btn-primary mx-2">Github link</a>
+  {% endif %}
+  {% if d.live_link|length > 0 %}
+    <a target="_blank"  href="{{d.live_link}}" class="card-link btn btn-primary mx-2">Live Link</a>
+  {% endif %}
+  {% if d.screenshot|length > 0 %}
+    <button type="button" class="card-link btn btn-primary mx-02" data-bs-toggle="modal" data-bs-target="#exampleModal_{{d.id}}">
+See Screenshot
+</button>
+  {% endif %}
+
+  {% if d.submitted_by.id == request.user.id or request.user.is_superuser %}
+
+  <button type="button" class="card-link btn btn-danger mx-02" data-bs-toggle="modal" data-bs-target="#deleteModal_{{d.id}}">
+    Delete button
+    </button>
+  {% endif %}
+
+  <!-- screenshot modal -->
+<div class="modal fade" id="exampleModal_{{d.id}}" tabindex="-1" aria-labelledby="exampleModalLabel_{{d.id}}" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel_{{d.id}}">Screenshot subbmitted</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+    
+        {% if d.screenshot|length > 0 %}
+        <img src="/media/{{d.screenshot}}"  class="img-thumbnail" alt="">
+        {% else %}
+          No screenshot submitted
+        {% endif %}
+        </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+      </div>
+    </div>
+  </div>
+</div>
+  <!-- Delete modal -->
+<div class="modal fade" id="deleteModal_{{d.id}}" tabindex="-1" aria-labelledby="exampleModalLabel_{{d.id}}" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel_{{d.id}}">Remove this Project?</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+    
+        <h1>Are you Sure You want to remove this project? This action cannot be undone.</h1>
+        </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+        <a href="/project/delete/{{d.id}}" class="btn btn-danger" >Yes</a>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+  </div>
+</div>
+{% endfor %}
+
+
+  
+</div>
+
+
+
 
 
 
