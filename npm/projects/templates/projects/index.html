@@ -1,4 +1,7 @@
-{% extends "projects/basic.html" %}
+
+{% extends "html/basic.html" %}
+
+
 
 {% block title %}
 Projects
@@ -242,43 +245,26 @@ See Screenshot
 
   </div>
 <div>
-  <ul class="remarks-con">
+
+
+
+
+  <ul class="remarks-con"> 
+     {% if not d.remark.all %}
+no remarks
+  {% else %}
+    {% for r in d.remark.all %}
     <li>
       <div class="post-comments">
-        <p class="meta"><span class="badge bg-secondary">4.5 	&#9733; </span>  Dec 18, 2014 <a href="#">JohnDoe</a> says : </p>
+        <p class="meta"><span class="badge bg-secondary">{{r.rating}} 	&#9733; </span>  Dec 18, 2014 <a href="#">{{r.author.username}}</a> says : </p>
         <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-            Etiam a sapien odio, sit amet
+          {{r.remarks}}
         </p>
     </div>
     </li>
-    <li>
-      <div class="post-comments">
-        <p class="meta"><span class="badge bg-secondary">4.5 	&#9733; </span>  Dec 18, 2014 <a href="#">JohnDoe</a> says : </p>
-        <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-            Etiam a sapien odio, sit amet
-        </p>
-    </div>
-    </li>
-    <li>
-      <div class="post-comments">
-        <p class="meta"><span class="badge bg-secondary">4.5 	&#9733; </span>  Dec 18, 2014 <a href="#">JohnDoe</a> says : </p>
-        <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-            Etiam a sapien odio, sit amet
-        </p>
-    </div>
-    </li>
-    <li>
-      <div class="post-comments">
-        <p class="meta"><span class="badge bg-secondary">4.5 	&#9733; </span>  Dec 18, 2014 <a href="#">JohnDoe</a> says : </p>
-        <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-            Etiam a sapien odio, sit amet
-        </p>
-    </div>
-    </li>
+    {% endfor %}
+  {% endif %}
+    
   </ul>
 </div>
 {{d.remarks.author.first_name}}
