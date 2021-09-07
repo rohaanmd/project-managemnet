@@ -40,24 +40,8 @@ Projects
 
 <div class="container custom-list">
 
-<h1 class="m-4 ms-0"> Thakur Polytechnic Projects</h1>
+<h1 class="m-4 ms-0"> Search for " {{searched}} "</h1>
 
-<div class="row">
-  <div class="col-2">
-    {% if user.is_authenticated %}
-  <a class="btn btn-primary" href="/project/create/">Create a project</a>
-  {% else %}
-  You need to <a class="" href="/account/login/">login</a> to create a project
-{% endif %}
-  </div>
-  <div class="col-10">
-    <form class="d-flex" method="POST" action= "/project/search/">
-      {% csrf_token %}
-      <input class="form-control me-2" type="search" placeholder="Search by title" aria-label="Search" name="searched">
-      <button class="btn btn-outline-success" type="submit">Search</button>
-    </form>
-  </div>
-</div>
 
 {% for d in data %}
   <div class="card">
@@ -241,49 +225,6 @@ See Screenshot
 </div>
 
   </div>
-<div>
-  <ul class="remarks-con">
-    <li>
-      <div class="post-comments">
-        <p class="meta"><span class="badge bg-secondary">4.5 	&#9733; </span>  Dec 18, 2014 <a href="#">JohnDoe</a> says : </p>
-        <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-            Etiam a sapien odio, sit amet
-        </p>
-    </div>
-    </li>
-    <li>
-      <div class="post-comments">
-        <p class="meta"><span class="badge bg-secondary">4.5 	&#9733; </span>  Dec 18, 2014 <a href="#">JohnDoe</a> says : </p>
-        <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-            Etiam a sapien odio, sit amet
-        </p>
-    </div>
-    </li>
-    <li>
-      <div class="post-comments">
-        <p class="meta"><span class="badge bg-secondary">4.5 	&#9733; </span>  Dec 18, 2014 <a href="#">JohnDoe</a> says : </p>
-        <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-            Etiam a sapien odio, sit amet
-        </p>
-    </div>
-    </li>
-    <li>
-      <div class="post-comments">
-        <p class="meta"><span class="badge bg-secondary">4.5 	&#9733; </span>  Dec 18, 2014 <a href="#">JohnDoe</a> says : </p>
-        <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-            Etiam a sapien odio, sit amet
-        </p>
-    </div>
-    </li>
-  </ul>
-</div>
-{{d.remarks.author.first_name}}
-
-
 </div>
 {% endfor %}
 

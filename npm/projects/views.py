@@ -29,11 +29,9 @@ def Index(request):
 
     return render(request,"projects/index.html",params)
 
-
 def CreateView(request):
 
     return render(request,"projects/createForm.html")
-
 
 def Create(request):
     if request.method == "POST":
@@ -105,3 +103,92 @@ def Delete(request,id):
     
     messages.add_message(request, messages.SUCCESS, 'Project deleted successfully.')
     return redirect("/project/")
+
+def Edit(request,id):
+    if request.method == "POST":
+        screenshot = None
+        email = request.POST.get("email")
+        title = request.POST.get("title")
+        desc = request.POST.get("desc")
+        enroll_no = request.POST.get("enroll_no")
+        year = request.POST.get("year")
+        sec = request.POST.get("sec")
+        git_link = request.POST.get("git_link")
+        live_link = request.POST.get("live_link")
+        
+        if(request.FILES):
+            screenshot = request.FILES["screenshot"]
+        submitted_by = request.user # user should be logined in
+
+        # validations
+        if(not(len(enroll_no)==10)):
+            messages.add_message(request, messages.ERROR, 'Enrollment number Invalid.')
+            return redirect("/project/create/")
+        if( not (validators.url(git_link))):
+            messages.add_message(request, messages.ERROR, 'Link Invalid.')
+            return redirect("/project/create/")
+        else:
+            git_link = formaturl(git_link)
+        if( len(live_link)<0 and not (validators.url(live_link))):
+            messages.add_message(request, messages.ERROR, 'Link1 Invalid.')
+            return redirect("/project/create/")
+        else:
+            live_link = formaturl(live_link)
+        if(request.user is None):
+            messages.add_message(request, messages.ERROR, 'You are not Loggedin. ')
+            return redirect("/account/login/")
+        
+        # validation over
+        try:
+            project = Project.objects.get(id=id)
+
+            project.email = email
+            project.title = title
+            project.desc = desc
+            project.enroll_no = enroll_no
+            project.year = year
+            project.sec = sec
+            project.git_link = git_link
+            project.live_link = live_link if (len(str(live_link))>0) else None
+            project.screenshot = screenshot if (not (request.FILES==None))else None
+            project.submitted_by = submitted_by
+
+            project.save()
+            messages.add_message(request, messages.SUCCESS,"Project edit successfull")
+            return redirect("/project/")
+        except Exception as e:
+                messages.add_message(request, messages.ERROR, e)
+                return redirect("/project/")
+            
+    else:
+        messages.add_message(request, messages.ERROR, 'You are not allowed here')
+        return redirect("/project/")
+
+def Search(request):
+    searched = request.POST['searched']
+    print(searched)
+    proList = Project.objects.filter(title__contains=searched)
+
+    params = {
+        "searched":searched,
+        "data" : proList
+    }
+
+    return render(request,"projects/searchresult.html",params)
+
+def Remarks(request):
+    params={}
+    return render(request,"projects/index.html",params)
+
+
+
+
+
+
+
+
+
+
+
+
+
