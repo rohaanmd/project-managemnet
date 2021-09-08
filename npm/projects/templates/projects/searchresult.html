@@ -1,4 +1,4 @@
-{% extends "projects/basic.html" %}
+{% extends "html/basic.html" %}
 
 {% block title %}
 Projects
@@ -6,6 +6,32 @@ Projects
 
 {% block css %}
 
+.custo-btn-container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.custom-btn{
+  background: #0d6efd;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  color: #fff;
+  text-align: center;
+  display: flex;
+    justify-content: center;
+    align-items: center;  
+  transition: width .2s;
+  <!-- transition: height 2s; -->
+}
+.custom-btn:hover {
+
+  width: 25px;
+  height: 25px;
+
+
+}
 
 .custom-list .card-title,.custom-list .card-subtitle ,.custom-list .card-text {
   text-transform: capitalize;
@@ -20,27 +46,18 @@ Projects
 
 {% block body %}
 
-{% if messages %}
-<ul class="messages list-unstyled">
-    {% for message in messages %}
-    <li {% if message.tags %}>
-
-      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-        <strong> {{ message }} </strong>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-{% endif %}
-    </li>
-    {% endfor %}
-</ul>
-{% endif %}
-
 <!-- body starts here -->
 
 
 <div class="container custom-list">
 
-<h1 class="m-4 ms-0"> Search for " {{searched}} "</h1>
+  <div class="row m-4 ms-0">
+  <div class="col-10"><h1 class=""> Search for " {{searched}} "</h1></div>
+
+<div class="col-2 custo-btn-container"><button class="custom-btn" onclick="goBack()"><i class="fas fa-angle-left"></i></button></div>
+
+</div>
+
 
 
 {% for d in data %}
@@ -49,22 +66,35 @@ Projects
     <h1 class="card-title">{{d.title}}</h1>
     <h4 class="card-subtitle mb-2 text-muted">{{d.submitted_by}} , {{d.year}}{{d.sec}}</h4>
     <p class="card-text">{{d.desc}}</p>
-  {% if d.git_link|length > 0 %}
+<!-- git -->
+    {% if d.git_link|length > 0 %}
     <a target="_blank" href="{{d.git_link}}" class="card-link btn btn-primary mx-2">Github link</a>
   {% endif %}
+  <!-- live -->
   {% if d.live_link|length > 0 %}
     <a target="_blank"  href="{{d.live_link}}" class="card-link btn btn-primary mx-2">Live Link</a>
   {% endif %}
+  <!-- screenshot -->
   {% if d.screenshot|length > 0 %}
     <button type="button" class="card-link btn btn-primary mx-02" data-bs-toggle="modal" data-bs-target="#exampleModal_{{d.id}}">
 See Screenshot
 </button>
   {% endif %}
 
+  <!-- user action -->
+
   {% if d.submitted_by.id == request.user.id or request.user.is_superuser %}
 
   <button type="button" class="card-link btn btn-danger mx-02" data-bs-toggle="modal" data-bs-target="#askModal_{{d.id}}">
     User Action
+    </button>
+  {% endif %}
+
+  <!-- staff action  -->
+  {% if request.user.is_staff %}
+
+  <button type="button" class="card-link btn btn-danger mx-02" data-bs-toggle="modal" data-bs-target="#staffModal_{{d.id}}">
+    Add remarks
     </button>
   {% endif %}
 
@@ -224,7 +254,87 @@ See Screenshot
   </div>
 </div>
 
+  <!-- Staff modal -->
+<div class="modal fade" id="staffModal_{{d.id}}" tabindex="-1" aria-labelledby="exampleModalLabel_{{d.id}}" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel_{{d.id}}">Add remarks</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      
+  
+  <form action="/project/remarks/{{d.id}}" method="post">
+    {% csrf_token %}
+    <div class="modal-body">
+      <div class="form-floating m-2">
+        <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px" name="remarks"></textarea>
+        <label for="floatingTextarea2">Remarks</label>
+      </div>
+<div class="form-floating m-2">
+  <select class="form-select" name="rating"   id="floatingSelectGrid" aria-label="Floating label select example">
+    <option selected>Open this select menu</option>
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+    <option value="5">5</option>
+    <option value="6">6</option>
+    <option value="7">7</option>
+    <option value="8">8</option>
+    <option value="9">9</option>
+    <option value="10">10</option>
+  </select>
+  <label for="floatingSelectGrid">Select Rating</label>
+</div>
+
   </div>
+<div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-success" >Submit</>
+
+      </div>
+        </form>
+      
+      
+    </div>
+  </div>
+</div>
+
+  </div>
+<div>
+  <ul class="remarks-con">
+
+{% if not d.projects.all %}
+<li>
+  <div class="post-comments">
+      <p>
+      No remarks...
+    </p>
+</div>
+</li>
+
+    {% else %}
+    {% for r in d.projects.all  %}
+
+      <li>
+        <div class="post-comments">
+          <p class="meta"><span class="badge bg-secondary">{{r.rating}} 	&#9733; </span>  {{r.pub_date}} <a href="#">{{r.author.username}}</a> says : </p>
+          <p>
+              {{r.remarks}}
+          </p>
+      </div>
+      </li>
+    {% endfor %}
+  
+{% endif %}
+
+
+
+  
+  </ul>
+</div>
+
 </div>
 {% endfor %}
 
@@ -235,7 +345,11 @@ See Screenshot
 
 
 
-
+<script>
+  function goBack() {
+    window.history.back();
+  }
+  </script>
 
 
 {% endblock body %}

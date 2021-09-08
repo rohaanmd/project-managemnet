@@ -1,8 +1,9 @@
 from django.shortcuts import render,redirect
 from django.contrib import messages
 import validators
+from datetime import datetime
 import re
-from .models import Project
+from .models import Project , Remarks
 # url = https://google.com
 def formaturl(url):
     if not re.match('(?:http|ftp|https)://', url):
@@ -21,7 +22,16 @@ def formaturl(url):
 #     return render(request,"projects/index.html")
 
 def Index(request):
-    proList = Project.objects.all()
+
+    # params
+    sort_by = request.GET.get("sort_by")
+    print(sort_by)
+    # proList = Project.objects.all()
+    # proList = Project.objects.order_by('title')
+    if sort_by:
+        proList = Project.objects.order_by(sort_by)
+    else:
+        proList = Project.objects.all()
 
     params = {
         "data" : proList
@@ -141,7 +151,7 @@ def Edit(request,id):
         # validation over
         try:
             project = Project.objects.get(id=id)
-
+            project.updated_on = datetime.now()
             project.email = email
             project.title = title
             project.desc = desc
@@ -176,7 +186,24 @@ def Search(request):
 
     return render(request,"projects/searchresult.html",params)
 
-def Remarks(request):
+def RemarksForm(request,id):
+    try:    
+        rating = request.POST['rating']
+        remarks = request.POST['remarks']
+        author = request.user
+        project = Project.objects.get(id=id)
+        print(float(rating))
+        NewRemarks = Remarks(rating = rating ,remarks = remarks , author = author ,  project = project )
+        NewRemarks.save()
+        return redirect("/project/")
+    except Exception as e:
+        messages.add_message(request, messages.ERROR, e)
+        return redirect("/project/")
+
+
+    
+    
+    
     params={}
     return render(request,"projects/index.html",params)
 

@@ -5,15 +5,6 @@ from django.db.models.fields import FloatField
 
 # Create your models here.
 
-class Remarks(models.Model):
-    rating = models.FloatField()
-    remarks = models.CharField( max_length=200)
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
-
-    class Meta:
-        verbose_name = 'Remarks'
-        verbose_name_plural = 'Remarks'
-
 class Project(models.Model):
     email = models.EmailField(max_length=254)
     title = models.CharField( max_length= 70)
@@ -27,8 +18,8 @@ class Project(models.Model):
     submitted_by = models.ForeignKey(User, on_delete=models.CASCADE)
     pub_on = models.DateField(auto_now_add=True)
     updated_on =models.DateField(auto_now=True)
-    remarks = models.ForeignKey(Remarks,on_delete=models.CASCADE,blank=True,null=True)
-
+    
+    
 
     def __str__(self):
         return self.title + " | " + str(self.submitted_by)
@@ -37,3 +28,18 @@ class Project(models.Model):
         managed = True
         verbose_name = 'Project'
         verbose_name_plural = 'Projects'
+
+class Remarks(models.Model):
+    rating = models.FloatField()
+    remarks = models.CharField( max_length=200)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    project = models.ForeignKey(Project , related_name="projects" , on_delete=models.CASCADE)
+    pub_date = models.DateField(auto_now_add=True)
+
+    
+    def __str__(self):
+        return self.project.title + " | " + str(self.author)
+
+    class Meta:
+        verbose_name = 'Remarks'
+        verbose_name_plural = 'Remarks'

@@ -1,4 +1,5 @@
-{% extends "projects/basic.html" %}
+
+{% extends "html/basic.html" %}
 
 {% block title %}
 Projects
@@ -50,12 +51,26 @@ Projects
   You need to <a class="" href="/account/login/">login</a> to create a project
 {% endif %}
   </div>
-  <div class="col-10">
+  <div class="col-8">
     <form class="d-flex" method="POST" action= "/project/search/">
       {% csrf_token %}
       <input class="form-control me-2" type="search" placeholder="Search by title" aria-label="Search" name="searched">
       <button class="btn btn-outline-success" type="submit">Search</button>
     </form>
+  </div>
+  <div class="col-2">
+    <form class="d-flex" action="/project/" method="GET">
+  <select Class="form-select" name="sort_by" id="">
+<option value="">Default</option>
+<option value="submitted_by">Author</option>
+<option value="title">Title</option>
+<option value="pub_on">Created On</option>
+<option value="updated_on">Updated On</option>
+    </select>  
+    <button class="btn btn-secondary ms-1" type="submit">Sort</button>
+    </form>
+  
+  
   </div>
 </div>
 
@@ -63,24 +78,37 @@ Projects
   <div class="card">
   <div class="card-block">
     <h1 class="card-title">{{d.title}}</h1>
-    <h4 class="card-subtitle mb-2 text-muted">{{d.submitted_by}} , {{d.year}}{{d.sec}}</h4>
+    <h4 class="card-subtitle mb-2 text-muted">{{d.submitted_by}} , {{d.year}}{{d.sec}} on {{d.pub_on}}  </h4> 
     <p class="card-text">{{d.desc}}</p>
-  {% if d.git_link|length > 0 %}
+<!-- git -->
+    {% if d.git_link|length > 0 %}
     <a target="_blank" href="{{d.git_link}}" class="card-link btn btn-primary mx-2">Github link</a>
   {% endif %}
+  <!-- live -->
   {% if d.live_link|length > 0 %}
     <a target="_blank"  href="{{d.live_link}}" class="card-link btn btn-primary mx-2">Live Link</a>
   {% endif %}
+  <!-- screenshot -->
   {% if d.screenshot|length > 0 %}
     <button type="button" class="card-link btn btn-primary mx-02" data-bs-toggle="modal" data-bs-target="#exampleModal_{{d.id}}">
 See Screenshot
 </button>
   {% endif %}
 
+  <!-- user action -->
+
   {% if d.submitted_by.id == request.user.id or request.user.is_superuser %}
 
   <button type="button" class="card-link btn btn-danger mx-02" data-bs-toggle="modal" data-bs-target="#askModal_{{d.id}}">
     User Action
+    </button>
+  {% endif %}
+
+  <!-- staff action  -->
+  {% if request.user.is_staff %}
+
+  <button type="button" class="card-link btn btn-danger mx-02" data-bs-toggle="modal" data-bs-target="#staffModal_{{d.id}}">
+    Add remarks
     </button>
   {% endif %}
 
@@ -240,49 +268,86 @@ See Screenshot
   </div>
 </div>
 
+  <!-- Staff modal -->
+<div class="modal fade" id="staffModal_{{d.id}}" tabindex="-1" aria-labelledby="exampleModalLabel_{{d.id}}" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel_{{d.id}}">Add remarks</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      
+  
+  <form action="/project/remarks/{{d.id}}" method="post">
+    {% csrf_token %}
+    <div class="modal-body">
+      <div class="form-floating m-2">
+        <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px" name="remarks"></textarea>
+        <label for="floatingTextarea2">Remarks</label>
+      </div>
+<div class="form-floating m-2">
+  <select class="form-select" name="rating"   id="floatingSelectGrid" aria-label="Floating label select example">
+    <option selected>Open this select menu</option>
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+    <option value="5">5</option>
+    <option value="6">6</option>
+    <option value="7">7</option>
+    <option value="8">8</option>
+    <option value="9">9</option>
+    <option value="10">10</option>
+  </select>
+  <label for="floatingSelectGrid">Select Rating</label>
+</div>
+
+  </div>
+<div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-success" >Submit</>
+
+      </div>
+        </form>
+      
+      
+    </div>
+  </div>
+</div>
+
   </div>
 <div>
   <ul class="remarks-con">
-    <li>
-      <div class="post-comments">
-        <p class="meta"><span class="badge bg-secondary">4.5 	&#9733; </span>  Dec 18, 2014 <a href="#">JohnDoe</a> says : </p>
-        <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-            Etiam a sapien odio, sit amet
-        </p>
-    </div>
-    </li>
-    <li>
-      <div class="post-comments">
-        <p class="meta"><span class="badge bg-secondary">4.5 	&#9733; </span>  Dec 18, 2014 <a href="#">JohnDoe</a> says : </p>
-        <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-            Etiam a sapien odio, sit amet
-        </p>
-    </div>
-    </li>
-    <li>
-      <div class="post-comments">
-        <p class="meta"><span class="badge bg-secondary">4.5 	&#9733; </span>  Dec 18, 2014 <a href="#">JohnDoe</a> says : </p>
-        <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-            Etiam a sapien odio, sit amet
-        </p>
-    </div>
-    </li>
-    <li>
-      <div class="post-comments">
-        <p class="meta"><span class="badge bg-secondary">4.5 	&#9733; </span>  Dec 18, 2014 <a href="#">JohnDoe</a> says : </p>
-        <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-            Etiam a sapien odio, sit amet
-        </p>
-    </div>
-    </li>
+
+{% if not d.projects.all %}
+<li>
+  <div class="post-comments">
+      <p>
+      No remarks...
+    </p>
+</div>
+</li>
+
+    {% else %}
+    {% for r in d.projects.all  %}
+
+      <li>
+        <div class="post-comments">
+          <p class="meta"><span class="badge bg-secondary">{{r.rating}} 	&#9733; </span>  {{r.pub_date}} <a href="#">{{r.author.username}}</a> says : </p>
+          <p>
+              {{r.remarks}}
+          </p>
+      </div>
+      </li>
+    {% endfor %}
+  
+{% endif %}
+
+
+
+  
   </ul>
 </div>
-{{d.remarks.author.first_name}}
-
 
 </div>
 {% endfor %}
