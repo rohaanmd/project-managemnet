@@ -1,4 +1,3 @@
-
 {% extends "html/basic.html" %}
 
 {% block title %}
@@ -7,6 +6,32 @@ Projects
 
 {% block css %}
 
+.custo-btn-container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.custom-btn{
+  background: #0d6efd;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  color: #fff;
+  text-align: center;
+  display: flex;
+    justify-content: center;
+    align-items: center;  
+  transition: width .2s;
+  <!-- transition: height 2s; -->
+}
+.custom-btn:hover {
+
+  width: 25px;
+  height: 25px;
+
+
+}
 
 .custom-list .card-title,.custom-list .card-subtitle ,.custom-list .card-text {
   text-transform: capitalize;
@@ -21,64 +46,25 @@ Projects
 
 {% block body %}
 
-{% if messages %}
-<ul class="messages list-unstyled">
-    {% for message in messages %}
-    <li {% if message.tags %}>
-
-      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-        <strong> {{ message }} </strong>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-{% endif %}
-    </li>
-    {% endfor %}
-</ul>
-{% endif %}
-
 <!-- body starts here -->
 
 
 <div class="container custom-list">
 
-<h1 class="m-4 ms-0"> Thakur Polytechnic Projects</h1>
+  <div class="row m-4 ms-0">
+  <div class="col-10"><h1 class=""> Search for " {{searched}} "</h1></div>
 
-<div class="row">
-  <div class="col-2">
-    {% if user.is_authenticated %}
-  <a class="btn btn-primary" href="/project/create/">Create a project</a>
-  {% else %}
-  You need to <a class="" href="/account/login/">login</a> to create a project
-{% endif %}
-  </div>
-  <div class="col-8">
-    <form class="d-flex" method="POST" action= "/project/search/">
-      {% csrf_token %}
-      <input class="form-control me-2" type="search" placeholder="Search by title" aria-label="Search" name="searched">
-      <button class="btn btn-outline-success" type="submit">Search</button>
-    </form>
-  </div>
-  <div class="col-2">
-    <form class="d-flex" action="/project/" method="GET">
-  <select Class="form-select" name="sort_by" id="">
-<option value="">Default</option>
-<option value="submitted_by">Author</option>
-<option value="title">Title</option>
-<option value="pub_on">Created On</option>
-<option value="updated_on">Updated On</option>
-    </select>  
-    <button class="btn btn-secondary ms-1" type="submit">Sort</button>
-    </form>
-  
-  
-  </div>
+<div class="col-2 custo-btn-container"><button class="custom-btn" onclick="goBack()"><i class="fas fa-angle-left"></i></button></div>
+
 </div>
+
+
 
 {% for d in data %}
   <div class="card">
   <div class="card-block">
     <h1 class="card-title">{{d.title}}</h1>
-    <h4 class="card-subtitle mb-2 text-muted">{{d.submitted_by}} , {{d.year}}{{d.sec}} on {{d.pub_on}}  </h4> 
+    <h4 class="card-subtitle mb-2 text-muted">{{d.submitted_by}} , {{d.year}}{{d.sec}}</h4>
     <p class="card-text">{{d.desc}}</p>
 <!-- git -->
     {% if d.git_link|length > 0 %}
@@ -359,7 +345,11 @@ See Screenshot
 
 
 
-
+<script>
+  function goBack() {
+    window.history.back();
+  }
+  </script>
 
 
 {% endblock body %}

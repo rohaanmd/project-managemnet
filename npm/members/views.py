@@ -43,9 +43,9 @@ def signup(request):
         pass2= request.POST.get("pass2")
         f_name = request.POST.get("first_name")
         last_name= request.POST.get("last_name")
-
+        
         # validationssssss
-        if not (User.objects.get(username=username)==None): 
+        if (User.objects.filter(username=username).exists()): 
             messages.add_message(request, messages.INFO, 'Username already exist.')
             return redirect("/account/signup/")           
             
