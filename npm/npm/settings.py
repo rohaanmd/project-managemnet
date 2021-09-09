@@ -28,8 +28,8 @@ SECRET_KEY = 'django-insecure--^f=ks3xvq0g+!1s(cl&ra0+4f5j!ef^bs8rm@cy*&1(%d0)za
 # DEBUG = True
 DEBUG = False
 
-# ALLOWED_HOSTS = ["rohaanmd.pythonanywhere.com"]
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["rohaanmd.pythonanywhere.com"]
+# ALLOWED_HOSTS = ["*"]
 
 # Application definition
 
